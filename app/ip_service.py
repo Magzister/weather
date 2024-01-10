@@ -1,14 +1,50 @@
 from abc import ABC, abstractmethod
 from typing import TypeAlias
+import urllib.request
+from urllib.error import URLError
+
+import config
+from exceptions import ApiServiceError
 
 
 IP: TypeAlias = str
 
 
 class IPService(ABC):
+
     @abstractmethod
-    def _fetch_api(self) -> IP:
+    def _fetch_ip(self) -> IP:
         pass
 
     def get_ip(self) -> IP:
-        return self._fetch_api()
+        '''Return IP adress. Public method. Must be used from client code.'''
+        return self._fetch_ip()
+
+
+class Ifconfig(IPService):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_ifconfig_response(self) -> bytes:
+        '''
+        Return response with ip from ifconfig.me.
+        Response has bytes type.
+        '''
+        url = config.IFCONFIG_URL
+        try:
+            return urllib.request.urlopen(url).read()
+        except URLError:
+            raise ApiServiceError
+
+    def _parse_ip(self, response: bytes) -> IP:
+        '''Convert IP in response from bytes to str'''
+        return response.decode("utf-8")
+
+    def _fetch_ip(self) -> IP:
+        ifconfig_response = self._get_ifconfig_response()
+        return self._parse_ip(ifconfig_response)
+
+
+if __name__ == "__main__":
+    print(Ifconfig().get_ip())

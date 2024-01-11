@@ -6,9 +6,9 @@ from typing import NamedTuple
 import urllib.request
 from urllib.error import URLError
 
-import config
-from exceptions import ApiServiceError
-from ip_service import IP
+from app import config
+from app.exceptions import ApiServiceError
+from app.ip_service import IP
 
 
 class Coordinates(NamedTuple):

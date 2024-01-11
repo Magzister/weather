@@ -3,8 +3,8 @@ from typing import TypeAlias
 import urllib.request
 from urllib.error import URLError
 
-import config
-from exceptions import ApiServiceError
+from app import config
+from app.exceptions import ApiServiceError
 
 
 IP: TypeAlias = str

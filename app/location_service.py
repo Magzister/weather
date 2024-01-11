@@ -30,15 +30,28 @@ class LocationService(ABC):
         pass
 
     def get_location(self, ip: IP) -> Location:
+        '''
+        Return location info by ip adress.
+        Public method.
+        Must be used by client code.
+        '''
         return self._fetch_location(ip)
 
 
 class Ipapi(LocationService):
+    '''
+    ipapi.co location service.
+    Supports only json data format for now.
+    '''
 
     def __init__(self) -> None:
         super().__init__()
 
     def _get_ipapi_response(self, ip: IP) -> bytes:
+        '''
+        Return response from ipapi service with location info.
+        Response is a json and has bytes type.
+        '''
         response_format = config.IPAPI_FORMAT
         url = config.IPAPI_URL.format(
                 ip=ip, response_format=response_format)
@@ -60,6 +73,10 @@ class Ipapi(LocationService):
         )
 
     def _parse_ipapi_response(self, response: bytes) -> Location:
+        '''
+        Transform bytes response to dict and parse it to Location dataclass.
+        Return Location object.
+        '''
         try:
             response_dict = json.loads(response)
         except JSONDecodeError:

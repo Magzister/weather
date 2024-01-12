@@ -7,7 +7,7 @@ def format_weather(location: Location, weather: Weather) -> str:
     sunset = weather.sunset.strftime("%H:%M")
     return (f"{location.country}, {location.city}\n"
             f"temperature: {weather.temperature:.1f}°C\n"
-            f"feels like: {weather.feelslike}°C\n"
+            f"feels like: {weather.feelslike:.1f}°C\n"
             f"{weather.description}\n"
             f"Sunrise: {sunrise}\n"
             f"Sunset: {sunset}\n")

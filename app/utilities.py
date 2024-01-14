@@ -7,7 +7,7 @@ Celsius: TypeAlias = float
 
 
 class Utilities:
-    
+
     @staticmethod
     def get_date() -> datetime:
         return datetime.now()

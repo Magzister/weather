@@ -3,6 +3,7 @@ from app.weather_service import Weather
 
 
 def format_weather(location: Location, weather: Weather) -> str:
+    '''Return string with formatted weather and location info.'''
     sunrise = weather.sunrise.strftime("%H:%M")
     sunset = weather.sunset.strftime("%H:%M")
     return (f"{location.country}, {location.city}\n"

@@ -3,18 +3,15 @@ from dataclasses import dataclass
 from datetime import datetime
 import json
 from json.decoder import JSONDecodeError
-from typing import TypeAlias, Literal
+from typing import Literal
 import urllib.request
 from urllib.error import URLError
 
 from app import config
 from app.exceptions import ApiServiceError
-from app.location_service import Coordinates, Ipapi
-from app.ip_service import Ifconfig
-
-
-Celsius: TypeAlias = float
-Fahrenheit: TypeAlias = float
+from app.location_service import Coordinates
+from app.utilities import Fahrenheit, Celsius
+from app.utilities import Utilities as u
 
 
 @dataclass(slots=True, frozen=True)
@@ -46,16 +43,9 @@ class VisualCrossing(WeatherService):
     def __init__(self) -> None:
         super().__init__()
 
-    def _get_date(self) -> datetime:
-        return datetime.now()
-
-    def _date_to_str(self, datetime: datetime) -> str:
-        date_format = config.DATE_FORMAT
-        return datetime.strftime(date_format)
-
     def _get_visualcrossing_response(self, coords: Coordinates) -> bytes:
-        date = self._get_date()
-        date_str = self._date_to_str(date)
+        date = u.get_date()
+        date_str = u.date_to_str(date, config.DATE_FORMAT)
         lat, lon = coords
         url = config.VISUALCROSSING_URL.format(
             latitude=lat,
@@ -74,7 +64,7 @@ class VisualCrossing(WeatherService):
             self,
             response_dict: dict,
             type_: Literal["temp", "feelslike"]) -> Celsius:
-        return self._fahrenheit_to_celsius(response_dict["days"][0][type_])
+        return u.fahrenheit_to_celsius(response_dict["days"][0][type_])
 
     def _parse_description(self, response_dict: dict) -> str:
         return response_dict["days"][0]["description"]
@@ -104,6 +94,8 @@ class VisualCrossing(WeatherService):
 
 
 if __name__ == "__main__":
+    from app.ip_service import Ifconfig
+    from app.location_service import Ipapi
     ip = Ifconfig().get_ip()
     location = Ipapi().get_location(ip)
     weather = VisualCrossing().get_weather(location.coordinates)

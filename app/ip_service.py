@@ -4,7 +4,7 @@ import urllib.request
 from urllib.error import URLError
 
 from app import config
-from app.exceptions import ApiServiceError
+from app.exceptions import IPServiceError
 
 
 IP: TypeAlias = str
@@ -35,7 +35,7 @@ class Ifconfig(IPService):
         try:
             return urllib.request.urlopen(url).read()
         except URLError:
-            raise ApiServiceError
+            raise IPServiceError("Error while requesting ip adress")
 
     def _parse_ip(self, response: bytes) -> IP:
         '''Convert IP in response from bytes to str'''

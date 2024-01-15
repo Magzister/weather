@@ -8,7 +8,7 @@ import urllib.request
 from urllib.error import URLError
 
 from app import config
-from app.exceptions import ApiServiceError
+from app.exceptions import WeatherServiceError
 from app.location_service import Coordinates
 from app.utilities import Fahrenheit, Celsius
 from app.utilities import Utilities as u
@@ -55,7 +55,7 @@ class VisualCrossing(WeatherService):
         try:
             return urllib.request.urlopen(url).read()
         except URLError:
-            raise ApiServiceError
+            raise WeatherServiceError("Error while requesting weather information")
 
     def _fahrenheit_to_celsius(self, temperature: Fahrenheit) -> Celsius:
         return (temperature - 32) * 5 / 9
@@ -79,7 +79,7 @@ class VisualCrossing(WeatherService):
         try:
             response_dict = json.loads(response)
         except JSONDecodeError:
-            raise ApiServiceError
+            raise WeatherServiceError("Error while parsing resporse")
         return Weather(
             temperature=self._parse_temperature(response_dict, "temp"),
             feelslike=self._parse_temperature(response_dict, "feelslike"),

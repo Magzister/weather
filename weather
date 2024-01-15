@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.12
-from app.exceptions import ApiServiceError
+from app.exceptions import IPServiceError, LocationServiceError, WeatherServiceError
 from app.ip_service import IPService, Ifconfig
 from app.location_service import LocationService, Ipapi
 from app.weather_service import WeatherService, VisualCrossing
@@ -12,18 +12,16 @@ def get_weather_info(
         weather_service: WeatherService) -> str:
     try:
         ip = ip_service.get_ip()
-    except ApiServiceError:
-        print("Can't get ip adress from ip service")
-        exit(1)
-    try:
         location = location_service.get_location(ip)
-    except ApiServiceError:
-        print("Can't get location from location service")
-        exit(1)
-    try:
         weather = weather_service.get_weather(location.coordinates)
-    except ApiServiceError:
-        print("Can't get weather information form weather service")
+    except IPServiceError as err:
+        print("Can't get information form ip service:", err)
+        exit(1)
+    except LocationServiceError as err:
+        print("Can't get location information from location service:", err)
+        exit(1)
+    except WeatherServiceError as err:
+        print("Can't get weather information from weather service:", err)
         exit(1)
     return format_weather(location, weather)
 

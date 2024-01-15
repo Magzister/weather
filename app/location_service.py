@@ -7,7 +7,7 @@ import urllib.request
 from urllib.error import URLError
 
 from app import config
-from app.exceptions import ApiServiceError
+from app.exceptions import LocationServiceError
 from app.ip_service import IP
 
 
@@ -58,7 +58,7 @@ class Ipapi(LocationService):
         try:
             return urllib.request.urlopen(url).read()
         except URLError:
-            raise ApiServiceError
+            raise LocationServiceError("Error while requesting location information")
 
     def _parse_country(self, response_dict: dict) -> str:
         return response_dict["country_name"]
@@ -80,7 +80,7 @@ class Ipapi(LocationService):
         try:
             response_dict = json.loads(response)
         except JSONDecodeError:
-            raise ApiServiceError
+            raise LocationServiceError("Error while parsing response")
         return Location(
             country=self._parse_country(response_dict),
             city=self._parse_city(response_dict),

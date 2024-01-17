@@ -1,5 +1,7 @@
 #!/usr/bin/env python3.12
-from app.exceptions import IPServiceError, LocationServiceError, WeatherServiceError
+from app.exceptions import (IPServiceError,
+                            LocationServiceError,
+                            WeatherServiceError)
 from app.ip_service import IPService, Ifconfig
 from app.location_service import LocationService, Ipapi
 from app.weather_service import WeatherService, VisualCrossing

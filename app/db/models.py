@@ -10,8 +10,9 @@ class Base(DeclarativeBase):
 class SeaSurfaceTemperature(Base):
     __tablename__ = "sea_surface_temperature"
 
-    country: Mapped[str] = mapped_column(primary_key=True)
-    city: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    country: Mapped[str]
+    city: Mapped[str]
     hyperlink: Mapped[str]
 
     def __repr__(self) -> str:

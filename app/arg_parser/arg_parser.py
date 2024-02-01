@@ -5,7 +5,7 @@ from app import config
 
 
 class Command(str, Enum):
-    UPDATE_SST_DATABASE = "createsstdb"
+    CREATE_SST_DATABASE = "createsstdb"
     NO_COMMAND = ""
 
 

@@ -7,6 +7,9 @@ from app.ip_service import IPService, Ifconfig
 from app.location_service import LocationService, Ipapi
 from app.weather_service import WeatherService, VisualCrossing
 from app.formatter import format_weather
+from app.db.db_config import engine
+from app.db.models import Base
+from app.web_pserser.parser import SeaTemperature
 
 
 def get_weather_info(
@@ -31,14 +34,18 @@ def get_weather_info(
 
 def main():
     args = ArgParser().get_args()
+    Base.metadata.create_all(engine)
     match args.command:
-        case Command.UPDATE_SST_DATABASE:
+        case Command.CREATE_SST_DATABASE:
             print("Creating database...")
+            SeaTemperature().populate_db()
         case Command.NO_COMMAND:
             ip_service = Ifconfig()
             location_service = Ipapi()
             weather_service = VisualCrossing()
-            print(get_weather_info(ip_service, location_service, weather_service))
+            print(get_weather_info(ip_service,
+                                   location_service,
+                                   weather_service))
 
 
 if __name__ == "__main__":

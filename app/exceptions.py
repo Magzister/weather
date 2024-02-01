@@ -14,6 +14,10 @@ class WeatherServiceError(ApiServiceError):
     pass
 
 
+class WebParserError(ApiServiceError):
+    pass
+
+
 class DBError(Exception):
     pass
 

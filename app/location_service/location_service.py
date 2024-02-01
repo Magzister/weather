@@ -58,7 +58,8 @@ class Ipapi(LocationService):
         try:
             return urllib.request.urlopen(url).read()
         except URLError:
-            raise LocationServiceError("Error while requesting location information")
+            raise LocationServiceError("Error while requesting "
+                                       "location information")
 
     def _parse_country(self, response_dict: dict) -> str:
         return response_dict["country_name"]

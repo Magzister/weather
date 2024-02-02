@@ -8,19 +8,9 @@ from urllib.error import URLError
 
 from app import config
 from app.exceptions import LocationServiceError
-from app.ip_service import IP
-
-
-class Coordinates(NamedTuple):
-    latitude: float
-    longitude: float
-
-
-@dataclass(slots=True, frozen=True)
-class Location:
-    country: str
-    city: str
-    coordinates: Coordinates
+from app.types import IP
+from app.types import Coordinates
+from app.types import Location
 
 
 class LocationService(ABC):

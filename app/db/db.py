@@ -1,18 +1,14 @@
-from typing import TypeAlias
-
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.exc import MultipleResultsFound
 
-from db_config import engine
-from models import Base, SeaSurfaceTemperature
+from app.db.db_config import engine
+from app.db.models import Base, SeaSurfaceTemperature
 from app.exceptions import NoResultError
 from app.exceptions import MultipleResultsError
 from app.web_pserser.parser import SST
-
-
-Hyperlink: TypeAlias = str
+from app.types import Hyperlink
 
 
 class DB:

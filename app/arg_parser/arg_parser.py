@@ -1,12 +1,6 @@
 import argparse
-from enum import Enum
 
 from app import config
-
-
-class Command(str, Enum):
-    CREATE_SST_DATABASE = "createsstdb"
-    NO_COMMAND = ""
 
 
 class ArgParser:

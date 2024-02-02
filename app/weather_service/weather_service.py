@@ -9,18 +9,11 @@ from urllib.error import URLError
 
 from app import config
 from app.exceptions import WeatherServiceError
-from app.location_service import Coordinates
-from app.utilities import Fahrenheit, Celsius
+from app.types import Coordinates
+from app.types import Fahrenheit
+from app.types import Celsius
+from app.types import Weather
 from app.utilities import Utilities as u
-
-
-@dataclass(slots=True, frozen=True)
-class Weather:
-    temperature: Celsius
-    feelslike: Celsius
-    description: str
-    sunrise: datetime
-    sunset: datetime
 
 
 class WeatherService(ABC):

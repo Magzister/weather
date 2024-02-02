@@ -1,5 +1,5 @@
-from app.location_service import Location
-from app.weather_service import Weather
+from app.types import Location
+from app.types import Weather
 
 
 def format_weather(location: Location, weather: Weather) -> str:

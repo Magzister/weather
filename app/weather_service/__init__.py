@@ -1,1 +1,1 @@
-from .weather_service import Weather, WeatherService, VisualCrossing
+from .weather_service import WeatherService, VisualCrossing

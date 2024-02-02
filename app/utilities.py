@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import TypeAlias
 from unicodedata import normalize
 
-
-Fahrenheit: TypeAlias = float
-Celsius: TypeAlias = float
+from app.types import Fahrenheit
+from app.types import Celsius
+from app.types import Hyperlink
 
 
 class Utilities:
@@ -29,3 +28,6 @@ class Utilities:
     def fold_equal(str1: str, str2: str) -> bool:
         return (normalize("NFC", str1).casefold() ==
                 normalize("NFC", str2).casefold())
+
+    async def make_request(url: Hyperlink) -> bytes:
+        pass

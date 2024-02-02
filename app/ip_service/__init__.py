@@ -1,1 +1,1 @@
-from .ip_service import IP, IPService, Ifconfig
+from .ip_service import IPService, Ifconfig

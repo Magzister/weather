@@ -6,19 +6,9 @@ from urllib.error import HTTPError, URLError
 
 from app import config
 from app.exceptions import WebParserError
+from app.types import CountryHref
+from app.types import SST
 from bs4 import BeautifulSoup, Tag
-from typing import NamedTuple
-
-
-class CountryHref(NamedTuple):
-    country: str
-    href: str
-
-
-class SST(NamedTuple):
-    country: str
-    city: str
-    href: str
 
 
 class SSTWebParser(ABC):

@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypeAlias
 import urllib.request
 from urllib.error import URLError
 
 from app import config
 from app.exceptions import IPServiceError
-
-
-IP: TypeAlias = str
+from app.types import IP
 
 
 class IPService(ABC):

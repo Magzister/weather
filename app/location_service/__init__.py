@@ -1,1 +1,1 @@
-from .location_service import Coordinates, Location, LocationService, Ipapi
+from .location_service import LocationService, Ipapi

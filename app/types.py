@@ -13,6 +13,7 @@ Celsius: TypeAlias = float
 
 class Command(str, Enum):
     CREATE_SST_DATABASE = "createsstdb"
+    SEA_TEMPERATURE = "seatemperature"
     NO_COMMAND = ""
 
 

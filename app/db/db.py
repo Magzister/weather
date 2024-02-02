@@ -12,6 +12,7 @@ from app.types import Hyperlink
 
 
 class DB:
+
     def __init__(self) -> None:
        Base.metadata.create_all(engine)
 
@@ -27,7 +28,8 @@ class DB:
             except NoResultFound:
                 raise NoResultError(f"No sst for {country}, {city}.")
             except MultipleResultsFound:
-                raise MultipleResultsError(f"Multiple sst for {country}, {city} in database.")
+                raise MultipleResultsError(f"Multiple sst for {country}, "
+                                           "{city} in database.")
 
     def populate_sst_table(self, sst_list: list[SST]) -> None:
         stmt = delete(SeaSurfaceTemperature)

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import urllib.request
-from urllib.request import Request
 import urllib.parse
 from urllib.error import HTTPError, URLError
 
@@ -8,6 +7,7 @@ from app import config
 from app.exceptions import WebParserError
 from app.types import CountryHref
 from app.types import SST
+from app.utilities import Utilities as u
 from bs4 import BeautifulSoup, Tag
 
 
@@ -26,17 +26,8 @@ class SeaTemperature(SSTWebParser):
     def __init__(self) -> None:
         super().__init__()
 
-    def _get_html(self, url: str) -> bytes:
-        request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        try:
-            return urllib.request.urlopen(request).read()
-        except HTTPError as err:
-            raise err
-        except URLError:
-            raise WebParserError(f"Error while requesting {url} html")
-
     def _parse_a_tag(self, a: Tag) -> tuple[str, str]:
-        text = a.get_text()
+        text = a.get_text().strip()
         href = a.get("href")
         if not isinstance(href, str):
             raise WebParserError("Hyperlink {href} is not a string")
@@ -62,11 +53,13 @@ class SeaTemperature(SSTWebParser):
         for countryhref in countryhref_list:
             country, href = countryhref
             try:
-                html = self._get_html(href)
+                html = u.make_sync_request(href)
             except HTTPError as err:
                 match err.code:
                     case 404: continue
                     case _: raise err
+            except URLError:
+                raise WebParserError(f"Error while requesting {href}")
             soup = BeautifulSoup(html, "html.parser")
             if isinstance(ul := soup.find(id="location-list"), Tag):
                 li_list = ul.find_all("li")
@@ -76,11 +69,13 @@ class SeaTemperature(SSTWebParser):
             for li in li_list:
                 city, href = self._parse_a_tag(li.a)
                 href = urllib.parse.urljoin(config.SEA_TEMPERATURE_URL, href)
+                country = u.shave_marks(country)
+                city = u.shave_marks(city)
                 sst_list.append(SST(country=country, city=city, href=href))
         return sst_list
 
     def _parse(self) -> list[SST]:
-        html = self._get_html(config.SEA_TEMPERATURE_URL)
+        html = u.make_sync_request(config.SEA_TEMPERATURE_URL)
         soup = BeautifulSoup(html, "html.parser")
         countryhref_list = self._get_countryhref_list(soup)
         return self._get_sst_list(countryhref_list)

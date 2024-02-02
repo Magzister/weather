@@ -14,7 +14,15 @@ class WeatherServiceError(ApiServiceError):
     pass
 
 
-class WebParserError(ApiServiceError):
+class ParserError(Exception):
+    pass
+
+
+class WebParserError(ParserError):
+    pass
+
+
+class SSTServiceError(ParserError):
     pass
 
 

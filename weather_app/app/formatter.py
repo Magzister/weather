@@ -5,7 +5,7 @@ from app.types import Celsius
 
 def format_weather(location: Location,
                    weather: Weather,
-                   sst: Celsius | None) -> str:
+                   sst: Celsius | None = None) -> str:
     '''Return string with formatted weather and location info.'''
     sunrise = weather.sunrise.strftime("%H:%M")
     sunset = weather.sunset.strftime("%H:%M")

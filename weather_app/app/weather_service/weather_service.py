@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
 import json
 from json.decoder import JSONDecodeError
 from typing import Literal
@@ -46,7 +47,7 @@ class VisualCrossing(WeatherService):
             date=date_str
         )
         try:
-            return urllib.request.urlopen(url).read()
+            return u.make_sync_request(url)
         except URLError:
             raise WeatherServiceError("Error while requesting weather information")
 
@@ -66,7 +67,12 @@ class VisualCrossing(WeatherService):
             self,
             response_dict: dict,
             type_: Literal["sunriseEpoch", "sunsetEpoch"]) -> datetime:
-        return datetime.fromtimestamp(response_dict["days"][0][type_])
+        tz_offset = response_dict["tzoffset"]
+        timedelta_ = timedelta(hours=abs(tz_offset))
+        timedelta_ = -timedelta_ if tz_offset < 0 else timedelta_
+        tz = timezone(timedelta_)
+        return datetime.fromtimestamp(response_dict["days"][0][type_],
+                                      tz=tz)
 
     def _parse_visualcrossing_response(self, response: bytes) -> Weather:
         try:

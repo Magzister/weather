@@ -1,0 +1,68 @@
+#!/usr/bin/env python3.12
+
+from app.arg_parser import ArgParser
+from app.db import DB
+from app.ip_service import Ifconfig
+from app.location_service import Ipapi
+from app.location_service import Geoapify
+from app.weather_service import VisualCrossing
+from app.web_pserser import SSTWebParser
+from app.web_pserser import SSTService
+from app.web_pserser import SeaTemperature
+from app.formatter import format_weather
+from app.types import Command
+from app.controller import Controller
+from app.exceptions import ApiServiceError
+
+
+def create_sst_db(sst_web_parser: SSTWebParser) -> None:
+    print("Creating database...")
+    db = DB()
+    print("Fetching data...")
+    sst_list = sst_web_parser.parse()
+    print("Populating database...")
+    db.populate_sst_table(sst_list)
+    print("Done!")
+
+
+def get_controller() -> Controller:
+    ip_service = Ifconfig()
+    location_service = Ipapi()
+    reverse_geocoding_service = Geoapify()
+    weather_service = VisualCrossing()
+    return Controller(ip_service,
+                      location_service,
+                      reverse_geocoding_service,
+                      weather_service)
+
+
+def print_weather(controller: Controller,
+                  sst_service: SSTService | None = None) -> None:
+    try:
+        location, weather = controller.get_weather_by_ip()
+    except ApiServiceError as err:
+        print(err)
+        exit(1)
+    if sst_service:
+        sst_href = DB().get_sst_hyperlink(location.country, location.city)
+        sst = sst_service.get_sst(sst_href)
+        print(format_weather(location, weather, sst))
+    else:
+        print(format_weather(location, weather))
+
+
+def main():
+    args = ArgParser().get_args()
+    controller = get_controller()
+    sst_web_parser = SeaTemperature()
+    match args.command:
+        case Command.CREATE_SST_DATABASE:
+            create_sst_db(sst_web_parser)
+        case Command.SEA_TEMPERATURE:
+            print_weather(controller, sst_web_parser)
+        case Command.NO_COMMAND:
+            print_weather(controller)
+
+
+if __name__ == "__main__":
+    main()

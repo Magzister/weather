@@ -18,7 +18,7 @@ class SSTService(ABC):
     def get_sst(self, href: Hyperlink) -> Celsius:
         return self._get_sst(href)
 
-class SeaTemperatureSSTService(SSTService):
+class SeaTemperature(SSTService):
 
     def __init__(self) -> None:
         super().__init__()

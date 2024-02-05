@@ -1,7 +1,8 @@
 #sqlite file
 database.db
 
-config.py
+#Environments variables
+.env
 
 __pycache__/
 

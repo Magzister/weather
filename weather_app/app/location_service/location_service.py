@@ -13,7 +13,7 @@ from app.types import Coordinates
 from app.types import Location
 
 
-class LocationService(ABC):
+class IPLocationService(ABC):
 
     @abstractmethod
     def _fetch_location(self, ip: IP) -> Location:
@@ -28,7 +28,17 @@ class LocationService(ABC):
         return self._fetch_location(ip)
 
 
-class Ipapi(LocationService):
+class ReverseGeocodingService(ABC):
+
+    @abstractmethod
+    def _fetch_address(self, coords: Coordinates) -> Location:
+        pass
+
+    def get_address(self, coords: Coordinates) -> Location:
+        return self._fetch_address(coords)
+
+
+class Ipapi(IPLocationService):
     '''
     ipapi.co location service.
     Supports only json data format for now.
@@ -71,7 +81,7 @@ class Ipapi(LocationService):
         try:
             response_dict = json.loads(response)
         except JSONDecodeError:
-            raise LocationServiceError("Error while parsing response")
+            raise LocationServiceError("Error while parsing location response")
         return Location(
             country=self._parse_country(response_dict),
             city=self._parse_city(response_dict),
@@ -81,6 +91,42 @@ class Ipapi(LocationService):
     def _fetch_location(self, ip: IP) -> Location:
         ipapi_response = self._get_ipapi_response(ip)
         return self._parse_ipapi_response(ipapi_response)
+
+
+class Geoapify(ReverseGeocodingService):
+
+    def _get_geoapify_response(self, coords: Coordinates) -> bytes:
+        url = config.GEOAPIFY_URL.format(latitude=coords.latitude,
+                                         longitude = coords.longitude)
+        try:
+            return urllib.request.urlopen(url).read()
+        except URLError:
+            raise LocationServiceError("Error while requesting "
+                                       "address information")
+
+    def _parse_city(self, response_dict: dict) -> str:
+        return response_dict["city"]
+
+    def _parse_country(self, response_dict: dict) -> str:
+        return response_dict["country"]
+
+    def _parse_geoapify_response(self,
+                                 response: bytes,
+                                 coords: Coordinates) -> Location:
+        try:
+            response_dict = json.loads(response)
+        except JSONDecodeError:
+            raise LocationServiceError("Error while parsing address response")
+        response_dict = response_dict["features"][0]["properties"]
+        return Location(
+            country=self._parse_country(response_dict),
+            city=self._parse_city(response_dict),
+            coordinates=coords
+        )
+
+    def _fetch_address(self, coords: Coordinates) -> Location:
+        geoapify_response = self._get_geoapify_response(coords)
+        return self._parse_geoapify_response(geoapify_response, coords)
 
 
 if __name__ == "__main__":

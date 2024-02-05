@@ -5,8 +5,11 @@ from urllib.error import HTTPError, URLError
 
 from app import config
 from app.exceptions import WebParserError
+from app.exceptions import SSTServiceError
 from app.types import CountryHref
 from app.types import SST
+from app.types import Hyperlink
+from app.types import Celsius
 from app.utilities import Utilities as u
 from bs4 import BeautifulSoup, Tag
 
@@ -21,7 +24,17 @@ class SSTWebParser(ABC):
         return self._parse()
 
 
-class SeaTemperature(SSTWebParser):
+class SSTService(ABC):
+    
+    @abstractmethod
+    def _get_sst(self, href: Hyperlink) -> Celsius:
+        pass
+
+    def get_sst(self, href: Hyperlink) -> Celsius:
+        return self._get_sst(href)
+
+
+class SeaTemperature(SSTWebParser, SSTService):
 
     def __init__(self) -> None:
         super().__init__()
@@ -79,3 +92,19 @@ class SeaTemperature(SSTWebParser):
         soup = BeautifulSoup(html, "html.parser")
         countryhref_list = self._get_countryhref_list(soup)
         return self._get_sst_list(countryhref_list)
+
+    def _parse_sst(self, html: bytes) -> Celsius:
+        soup = BeautifulSoup(html, "html.parser")
+        if isinstance(div := soup.find(id="sea-temperature"), Tag):
+            raw_text = div.span.get_text()
+            return float(raw_text[:raw_text.index("°C")])
+        else:
+            raise SSTServiceError("There is no tag with "
+                                  "id=\"sea-temperature\"")
+
+    def _get_sst(self, href: Hyperlink) -> Celsius:
+        try:
+            html = u.make_sync_request(href)
+        except URLError:
+            raise SSTServiceError(f"Error while requesting {href}")
+        return self._parse_sst(html)
